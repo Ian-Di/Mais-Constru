@@ -461,6 +461,10 @@ p{
     color: #D02329;
 }
 
+.main-3 .card br{
+    display: none;
+}
+
 .footer{
     display: flex;
     flex-direction: column;
