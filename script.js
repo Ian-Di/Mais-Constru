@@ -38,3 +38,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function clickMenu() {
+           if (listmob.style.display == 'flex'){
+            listmob.style.display = 'none'
+           } else{
+            listmob.style.display = 'flex'
+           }
+        }
+
+
+const my0bserver = new IntersectionObserver( (entries) => {
+    entries.forEach( (entry) => {
+        if(entry.isIntersecting ){
+            entry.target.classList.add('show')
+        } else {
+            entry.target.classList.remove('show')
+        }
+    })
+})
+
+const elements = document.querySelectorAll('.card1')
+
+
+elements.forEach((element) => my0bserver.observe(element))

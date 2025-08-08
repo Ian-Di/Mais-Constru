@@ -15,8 +15,16 @@
         <img src="../assets/logo.svg" alt="">
         <div class="nav-links">
             <a href="../">HOME</a>
-            <a href="">SOBRE</a>
-            <a href="">CONTATO</a>
+            <a href="../sobre/sobre.html">SOBRE</a>
+            <a href="../contato/contato.html">CONTATO</a>
+        </div>
+        <div class="burguer">
+            <img src="../assets/icons8-cardápio.svg" onclick="clickMenu()">
+            <div id="listmob">
+                <a href="">Home</a>
+                <a href="../sobre/sobre.html">Sobre</a>
+                <a href="../contato/contato.html">Contato</a>
+            </div>
         </div>
     </div>
     <div class="main-1">
@@ -85,4 +93,29 @@
         <h2>2025 | Mais Construção - Todos os direitos reservados</h2>
     </div>
 </body>
+<script>
+function clickMenu() {
+        if (listmob.style.display == 'flex'){
+        listmob.style.display = 'none'
+        } else{
+        listmob.style.display = 'flex'
+        }
+    }
+
+
+const my0bserver = new IntersectionObserver( (entries) => {
+    entries.forEach( (entry) => {
+        if(entry.isIntersecting ){
+            entry.target.classList.add('show')
+        } else {
+            entry.target.classList.remove('show')
+        }
+    })
+})
+
+const elements = document.querySelectorAll('.card1')
+
+
+elements.forEach((element) => my0bserver.observe(element))
+</script>
 </html>

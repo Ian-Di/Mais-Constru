@@ -3,6 +3,10 @@
     padding: 0;
 }
 
+.burguer{
+    display: none;
+}
+
 .button a{
     display: flex;
     justify-self: left;
@@ -494,7 +498,49 @@
 }
 
 @media screen and (width < 560px){
-    .button a{
+.burguer{
+    display: block;
+    flex-direction: column;
+}
+
+.burguer img{
+    display: flex;
+    width: 4vh;
+}
+
+#listmob{
+    position: absolute;
+    top: 80px;
+    right: 0px;
+    height: 250px;
+    width: 100%;
+
+
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;;
+    padding: 10px;
+    
+
+    background-color: #3247A2;
+    transition: 1s;
+}
+
+#listmob a{
+    font-family: "Poppins", serif;
+    font-weight: 500;
+    color: #ffffff;
+    text-decoration: none;  
+}
+
+#listmob a:hover{
+    border-radius: 20px;
+    text-decoration: underline 2px #D02329;
+    color: #F6E324;
+}
+
+.button a{
     display: flex;
     justify-self: left;
     padding: 20px 30px;
