@@ -270,7 +270,7 @@
     gap: 15px;
 }
 
-.main-2 .area-cards .card-main-2 a{
+.main-2 .area-cards .card-main-2 .service-card{
     display: flex;
     justify-content: center;
     align-items: end;
@@ -289,25 +289,25 @@
     transition: 0.5s;
 }
 
-.main-2 .area-cards .card-main-2:nth-child(1) a{
+.main-2 .area-cards .card-main-2:nth-child(1) .service-card{
     background-image: url(./assets/serv1.png);
     background-size: cover;
     background-position: center;
 }
 
-.main-2 .area-cards .card-main-2:nth-child(2) a{
+.main-2 .area-cards .card-main-2:nth-child(2) .service-card{
     background-image: url(./assets/serv2.png);
     background-size: cover;
     background-position: center;
 }
 
-.main-2 .area-cards .card-main-2:nth-child(3) a{
+.main-2 .area-cards .card-main-2:nth-child(3) .service-card{
     background-image: url(./assets/serv3.png);
     background-size: cover;
     background-position: center;
 }
 
-.main-2 .area-cards .card-main-2 a:hover{
+.main-2 .area-cards .card-main-2 .service-card:hover{
     display: flex;
     justify-content: center;
     align-items: center;
