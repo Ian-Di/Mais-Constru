@@ -5,81 +5,85 @@ document.addEventListener('DOMContentLoaded', () => {
     serviceCards.forEach(card => {
         const video = card.querySelector('video');
         const textSpan = card.querySelector('span');
-        const originalBackgroundImage = card.style.backgroundImage;
 
-        // Estilos para o vídeo (se o seu CSS já não fizer isso)
+        // Garante que o vídeo e o texto estão posicionados e em camadas corretas via JS
+        card.style.position = 'relative'; // Essencial para que os filhos absolutos se posicionem corretamente
         video.style.position = 'absolute';
         video.style.top = '0';
         video.style.left = '0';
         video.style.width = '100%';
         video.style.height = '100%';
         video.style.objectFit = 'cover';
-        video.style.zIndex = '-1';
-        video.style.opacity = '0';
-        video.style.transition = 'opacity 0.5s ease-in-out';
-        
-        // Estilos para o span do texto
+        video.style.zIndex = '-1'; // Coloca o vídeo atrás do texto
+        video.style.opacity = '0'; // Vídeo invisível
+        video.style.transition = 'opacity 0.5s ease-in-out'; // Transição suave
+
+        textSpan.style.zIndex = '1'; // Coloca o texto acima do vídeo
         textSpan.style.transition = 'opacity 0.5s ease-in-out';
 
-        function showVideo() {
-            video.play();
-            video.style.opacity = '1';
-            textSpan.style.opacity = '0';
-            card.style.backgroundImage = 'none';
-        }
+        // Salva a imagem de fundo original usando uma propriedade do elemento
+        const originalBackgroundImage = window.getComputedStyle(card).backgroundImage;
+        
+        // Função unificada para alternar o estado do card
+        const toggleCard = (isActive) => {
+            if (isActive) {
+                // Ao ativar o card
+                video.play();
+                video.style.opacity = '1';
+                textSpan.style.opacity = '0';
+                // Garante que a imagem de fundo seja removida de forma definitiva
+                card.style.backgroundImage = 'none';
+                card.classList.add('active-video');
+            } else {
+                // Ao desativar o card
+                video.pause();
+                video.currentTime = 0;
+                video.style.opacity = '0';
+                textSpan.style.opacity = '1';
+                card.classList.remove('active-video');
 
-        function hideVideo() {
-            video.pause();
-            video.currentTime = 0;
-            video.style.opacity = '0';
-            textSpan.style.opacity = '1';
-            card.style.backgroundImage = originalBackgroundImage;
-        }
+                // Adiciona um pequeno atraso para restaurar a imagem de fundo,
+                // garantindo que a transição do vídeo termine
+                setTimeout(() => {
+                    if (!card.classList.contains('active-video')) {
+                        card.style.backgroundImage = originalBackgroundImage;
+                    }
+                }, 500);
+            }
+        };
 
         if (isTouchDevice) {
             // Lógica para dispositivos móveis (com toque)
             card.addEventListener('click', (event) => {
-                event.preventDefault(); // Evita o comportamento padrão do link, se houver
+                event.preventDefault();
                 
-                // Se o vídeo já estiver visível, esconde. Caso contrário, mostra.
-                if (video.style.opacity === '1') {
-                    hideVideo();
-                } else {
-                    // Esconde todos os outros vídeos antes de mostrar o atual
-                    serviceCards.forEach(otherCard => {
-                        if (otherCard !== card) {
-                            const otherVideo = otherCard.querySelector('video');
-                            const otherTextSpan = otherCard.querySelector('span');
-                            otherVideo.pause();
-                            otherVideo.currentTime = 0;
-                            otherVideo.style.opacity = '0';
-                            otherTextSpan.style.opacity = '1';
-                            otherCard.style.backgroundImage = otherCard.dataset.originalBgImage || 'none'; // Usa o data attribute para restaurar
-                        }
-                    });
+                const cardIsActive = video.style.opacity === '1';
 
-                    // Armazena a imagem de fundo original no data attribute para restaurar
-                    if (!card.dataset.originalBgImage) {
-                        card.dataset.originalBgImage = card.style.backgroundImage;
+                // Desativa todos os outros cards primeiro
+                serviceCards.forEach(otherCard => {
+                    if (otherCard !== card) {
+                        const otherVideo = otherCard.querySelector('video');
+                        otherVideo.pause();
+                        otherVideo.currentTime = 0;
+                        otherVideo.style.opacity = '0';
+                        otherCard.querySelector('span').style.opacity = '1';
+                        otherCard.style.backgroundImage = window.getComputedStyle(otherCard).backgroundImage;
+                        otherCard.classList.remove('active-video');
                     }
+                });
 
-                    showVideo();
-                }
+                toggleCard(!cardIsActive);
             });
         } else {
             // Lógica para desktops (com mouse)
-            card.addEventListener('mouseenter', () => {
-                showVideo();
-            });
-
-            card.addEventListener('mouseleave', () => {
-                hideVideo();
-            });
+            card.addEventListener('mouseenter', () => toggleCard(true));
+            card.addEventListener('mouseleave', () => toggleCard(false));
         }
     });
 });
 
-// Mantém suas outras funções
+
+// Suas outras funções
 function clickMenu() {
     if (listmob.style.display === 'flex') {
         listmob.style.display = 'none';
