@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const serviceCards = document.querySelectorAll('.service-card');
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const hasInteracted = new Set(); // Conjunto para rastrear interações
+    const hasInteracted = new Set(); // Conjunto para rastrear interações em dispositivos de toque
 
     // --- Funções de Ativação e Desativação ---
     const activateCard = (card) => {
@@ -29,8 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.opacity = '1';
         video.style.opacity = '1';
         textSpan.style.opacity = '0';
-
-        // Tenta reproduzir o vídeo. Isso só funcionará após uma interação do usuário em iOS.
         video.play().catch(error => {
             console.warn("A reprodução automática do vídeo foi bloqueada. A primeira reprodução requer uma interação do usuário.", error);
         });
@@ -67,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (video) {
             video.removeAttribute('controls');
             video.muted = true;
-            video.playsInline = true; // Adiciona playsInline para melhor compatibilidade com iOS
+            video.playsInline = true; // Necessário para iOS
             
             video.style.cssText = `
                 position: absolute;
@@ -87,14 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
             textSpan.style.transition = 'opacity 0.5s ease-in-out';
         }
 
-        // Adiciona um evento de clique para a primeira interação em dispositivos de toque
-        card.addEventListener('click', () => {
-            if (isTouchDevice && !hasInteracted.has(card)) {
-                // Ativa o card somente na primeira interação
-                activateCard(card);
-                hasInteracted.add(card);
-            }
-        });
+        // Adiciona o evento de toque para a primeira interação em dispositivos móveis
+        if (isTouchDevice) {
+            card.addEventListener('click', () => {
+                if (!hasInteracted.has(card)) {
+                    activateCard(card);
+                    hasInteracted.add(card);
+                }
+            });
+        }
     });
 
     if (isTouchDevice) {
