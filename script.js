@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const serviceCards = document.querySelectorAll('.service-card');
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const hasInteracted = new Set(); // Conjunto para rastrear interações
 
     // --- Funções de Ativação e Desativação ---
     const activateCard = (card) => {
@@ -28,7 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.opacity = '1';
         video.style.opacity = '1';
         textSpan.style.opacity = '0';
-        video.play();
+
+        // Tenta reproduzir o vídeo. Isso só funcionará após uma interação do usuário em iOS.
+        video.play().catch(error => {
+            console.warn("A reprodução automática do vídeo foi bloqueada. A primeira reprodução requer uma interação do usuário.", error);
+        });
     };
 
     const deactivateCard = (card) => {
@@ -57,15 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const video = card.querySelector('video');
         const textSpan = card.querySelector('span');
 
-        // Configuração inicial para que o layout não seja afetado
         card.style.position = 'relative';
 
         if (video) {
             video.removeAttribute('controls');
-            // --- NOVA LINHA: Silencia o vídeo para permitir o autoplay ---
             video.muted = true;
+            video.playsInline = true; // Adiciona playsInline para melhor compatibilidade com iOS
             
-            // Aplica os estilos de posicionamento e z-index logo de início
             video.style.cssText = `
                 position: absolute;
                 top: 0;
@@ -80,10 +83,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (textSpan) {
-            // Aplica o z-index para garantir que o texto fique acima do vídeo
             textSpan.style.zIndex = '3';
             textSpan.style.transition = 'opacity 0.5s ease-in-out';
         }
+
+        // Adiciona um evento de clique para a primeira interação em dispositivos de toque
+        card.addEventListener('click', () => {
+            if (isTouchDevice && !hasInteracted.has(card)) {
+                // Ativa o card somente na primeira interação
+                activateCard(card);
+                hasInteracted.add(card);
+            }
+        });
     });
 
     if (isTouchDevice) {
@@ -91,7 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const videoObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    activateCard(entry.target);
+                    // Reproduz o vídeo apenas se já houve interação
+                    if (hasInteracted.has(entry.target)) {
+                        activateCard(entry.target);
+                    }
                 } else {
                     deactivateCard(entry.target);
                 }
@@ -112,23 +126,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Outras funções permanecem as mesmas
 function clickMenu() {
-        if (listmob.style.display === 'flex') {
-            listmob.style.display = 'none';
-        } else {
-            listmob.style.display = 'flex';
-        }
+    const listmob = document.getElementById('listmob'); // Certifique-se de que listmob está definido
+    if (listmob.style.display === 'flex') {
+        listmob.style.display = 'none';
+    } else {
+        listmob.style.display = 'flex';
     }
+}
 
-    const my0bserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('show');
-            } else {
-                entry.target.classList.remove('show');
-            }
-        });
+const my0bserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+        } else {
+            entry.target.classList.remove('show');
+        }
     });
+});
 
-    const elements = document.querySelectorAll('.card1');
-    elements.forEach((element) => my0bserver.observe(element));
+const elements = document.querySelectorAll('.card1');
+elements.forEach((element) => my0bserver.observe(element));
