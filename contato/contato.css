@@ -79,7 +79,7 @@ p{
     display: flex;
     place-self: center;
     gap: 60px;
-    padding: 40px;
+    padding: 40px 0px;
 }
 
 .main-1 .cards-main-1 .card{
@@ -88,6 +88,7 @@ p{
     align-items: center;
     gap: 30px;
     text-align: center;
+    width: 250px;
 }
 
 .cards-main-1 .card img{

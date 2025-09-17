@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const serviceCards = document.querySelectorAll('.service-card');
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const hasInteracted = new Set(); // Conjunto para rastrear interações em dispositivos de toque
 
     // --- Funções de Ativação e Desativação ---
     const activateCard = (card) => {
@@ -27,11 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         overlay.style.opacity = '1';
-        video.style.opacity = '1';
-        textSpan.style.opacity = '0';
-        video.play().catch(error => {
-            console.warn("A reprodução automática do vídeo foi bloqueada. A primeira reprodução requer uma interação do usuário.", error);
-        });
+        if (video) video.style.opacity = '1';
+        if (textSpan) textSpan.style.opacity = '0';
+        if (video) {
+            video.play().catch(error => {
+                console.warn("A reprodução automática do vídeo foi bloqueada. A primeira reprodução requer uma interação do usuário.", error);
+            });
+        }
     };
 
     const deactivateCard = (card) => {
@@ -39,14 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const textSpan = card.querySelector('span');
         const overlay = card.querySelector('.video-overlay');
 
-        video.pause();
-        video.currentTime = 0;
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
         
         if (overlay) {
             overlay.style.opacity = '0';
         }
-        video.style.opacity = '0';
-        textSpan.style.opacity = '1';
+        if (video) video.style.opacity = '0';
+        if (textSpan) textSpan.style.opacity = '1';
 
         setTimeout(() => {
             if (overlay && overlay.parentNode) {
@@ -65,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (video) {
             video.removeAttribute('controls');
             video.muted = true;
-            video.playsInline = true; // Necessário para iOS
+            video.playsInline = true;
             
             video.style.cssText = `
                 position: absolute;
@@ -84,16 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
             textSpan.style.zIndex = '3';
             textSpan.style.transition = 'opacity 0.5s ease-in-out';
         }
-
-        // Adiciona o evento de toque para a primeira interação em dispositivos móveis
-        if (isTouchDevice) {
-            card.addEventListener('click', () => {
-                if (!hasInteracted.has(card)) {
-                    activateCard(card);
-                    hasInteracted.add(card);
-                }
-            });
-        }
     });
 
     if (isTouchDevice) {
@@ -101,16 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const videoObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    // Reproduz o vídeo apenas se já houve interação
-                    if (hasInteracted.has(entry.target)) {
-                        activateCard(entry.target);
-                    }
+                    activateCard(entry.target);
                 } else {
                     deactivateCard(entry.target);
                 }
             });
         }, {
-            threshold: 0.7
+            threshold: 0.7 // O vídeo ativa quando 70% do card está visível
         });
 
         serviceCards.forEach(card => {
